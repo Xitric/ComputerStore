@@ -8,6 +8,7 @@ package kdavi16.dm505.computerstore.business;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import kdavi16.dm505.computerstore.shared.TableData;
 
 /**
  * Mediator for business logic. This mediator will set up a connection to the
@@ -31,6 +32,9 @@ public class StoreMediator {
 	 * The connection to the database.
 	 */
 	private Connection connection;
+	
+	/* Objects for handling various sql queries and updates */
+	private final PartStorage partStorage;
 
 	/**
 	 * Get the singleton instance of the store mediator. This instance will give
@@ -53,6 +57,8 @@ public class StoreMediator {
 	private StoreMediator() {
 		//TODO: Handle connection error
 		establishConnection();
+		
+		partStorage = new PartStorage();
 	}
 
 	/**
@@ -72,18 +78,21 @@ public class StoreMediator {
 
 		return true;
 	}
+	
+	/**
+	 * Get a view of all the components and their amounts in the database.
+	 *
+	 * @return a view of all the components and their amounts in the database
+	 */
+	public TableData listComponents() {
+		return partStorage.listComponents(connection);
+	}
 
 	/**
 	 * Close and dispose all resources used by this store mediator.
 	 */
 	public void dispose() {
-		//Attempt to close the connection only if it was established
-		if (connection != null) {
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		//Attempt to close the connection
+		DBUtil.close(connection);
 	}
 }
