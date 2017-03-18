@@ -25,7 +25,8 @@ public class ComputerStore extends Application {
 		Parent root = FXMLLoader.load(getClass().getResource("StoreFront.fxml"));
 
 		Scene scene = new Scene(root);
-
+		
+		stage.setTitle("Computer Store");
 		stage.setScene(scene);
 		stage.show();
 	}

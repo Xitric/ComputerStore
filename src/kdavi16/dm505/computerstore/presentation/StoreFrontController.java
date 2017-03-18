@@ -55,6 +55,11 @@ public class StoreFrontController implements Initializable {
 		for (int i = 0; i < data.getColumnCount(); i++) {
 			TableColumn<List<Object>, Object> column = new TableColumn<>(data.getColumnName(i));
 			
+			//The first column should be styled specially
+			if (i == 0) {
+				column.setId("first-column");
+			}
+			
 			//We need to set our own cell value factory to get the table data to
 			//show up, since we are creating a dynamic table.
 			column.setCellValueFactory(param -> {

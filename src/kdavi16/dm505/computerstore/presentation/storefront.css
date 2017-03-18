@@ -1,7 +1,224 @@
 /*
- * Empty Stylesheet file.
+ * Stylesheet inspired heavily by Material Design. For more information, go to:
+ * https://material.io/
  */
 
-.mainFxmlClass {
+@font-face {
+	src: url('res/fonts/Roboto-Medium.ttf');
+}
+@font-face {
+	src: url('res/fonts/Roboto-Regular.ttf');
+}
+@font-face {
+	src: url('res/fonts/Roboto-Black.ttf');
+}
 
+.mainFxmlClass {
+	-blue-base: #2196f3;
+	-blue-dark1: #1a77c9;
+	-blue-dark2: #176bb5;
+	-javafx-bg: #f4f4f4;
+
+	-fx-font-family: "Roboto Regular";
+}
+
+/* ----- General ----- */
+.label {
+	-fx-font-size: 14;
+	-fx-text-fill: black;
+}
+
+/* ----- Button ----- */
+.button {
+	-fx-font-family: "Roboto Medium";
+	-fx-font-size: 21;
+	-fx-text-fill: -blue-base;
+	-fx-background-color: transparent;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-background-radius: 2;
+	-fx-padding: 8 16 8 16;
+}
+
+.button:hover {
+	-fx-background-color: rgba(153, 153, 153, 0.2);
+}
+
+.button:armed {
+	-fx-background-color: rgba(153, 153, 153, 0.4);
+}
+
+.button.raised {
+	-fx-background-color: -blue-base;
+	-fx-text-fill: white;
+	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 10, 0, 1, 1);
+}
+
+.button.raised:hover {
+	-fx-background-color: -blue-dark1;
+}
+
+.button.raised:armed {
+	-fx-background-color: -blue-dark2;
+	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 20, 0, 4, 4);
+}
+
+/* ----- Tab Pane ----- */
+.tab-header-background {
+	-fx-background-color: #125688;
+}
+
+.tab-label {
+	-fx-font-family: "Roboto Medium";
+	-fx-font-size: 21;
+	-fx-text-fill: white;
+}
+
+.tab {
+	-fx-background-color: transparent;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-background-radius: 0;
+	-fx-padding: 8 16 8 16;
+}
+
+.tab:hover {
+	-fx-border-style: solid;
+	-fx-border-width: 0 0 4 0;
+	-fx-padding: 8 16 4 16;
+	-fx-border-color: #74a5c4;
+}
+
+.tab:selected {
+	-fx-border-style: solid;
+	-fx-border-width: 0 0 4 0;
+	-fx-padding: 8 16 4 16;
+	-fx-border-color: #d3f2ff;
+}
+
+/* ----- Text Area and Field ----- */
+.text-area,
+.text-field {
+	-fx-font-size: 16;
+	-fx-text-fill: black;
+	-fx-background-color: transparent;
+	-fx-border-style: solid;
+	-fx-border-width: 0 0 1 0;
+	-fx-border-color: #d2d2d2;
+	-fx-wrap-text: true;
+}
+
+.text-area:focused,
+.text-field:focused {
+	-fx-border-width: 0 0 2 0;
+	-fx-border-insets: 0 0 -1 0;
+	-fx-border-color: -blue-base;
+}
+
+.text-area .content {
+	-fx-background-color: transparent;
+}
+
+.text-field {
+	-fx-text-overrun: ellipsis;
+	-fx-padding: 8 0 8 0;
+	-fx-border-insets: 0 0 8 0;
+}
+
+.text-field:focused {
+	-fx-border-insets: 0 0 7 0;
+}
+
+/* ----- Scroll Bar ----- */
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+	-fx-background-color: -blue-base;
+	-fx-background-radius: 0;
+}
+
+.scroll-bar:horizontal:hover .thumb,
+.scroll-bar:vertical:hover .thumb {
+	-fx-background-color: -blue-dark1;
+}
+
+.scroll-bar:horizontal:pressed .thumb,
+.scroll-bar:vertical:pressed .thumb {
+	-fx-background-color: -blue-dark2;
+}
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track {
+	-fx-background-color: transparent;
+	-fx-border-style: solid;
+	-fx-border-width: 1;
+	-fx-border-color: rgba(0, 0, 0, 0.1);
+	-fx-border-insets: 5;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow,
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+	-fx-shape: " ";
+	-fx-padding: 0 3 0 3;
+}
+
+.scroll-bar {
+	-fx-background-color: transparent;
+}
+
+/* ----- Table ----- */
+.table-view .column-header-background,
+.table-view .column-header,
+.table-view .filler,
+.table-view,
+.table-row-cell {
+	-fx-background-color: transparent;
+}
+
+/*.table-view {
+	-fx-padding: 0 24 0 24;
+}*/
+
+.table-row-cell {
+	-fx-border-color: #e0e0e0;
+	-fx-border-width: 0 0 1 0;
+}
+
+.table-row-cell:selected {
+	-fx-background-color: #c8ebfb;
+	-fx-text-background-color: black;
+}
+
+.table-view .table-cell {
+	-fx-font-family: "Roboto Medium";
+	-fx-border-color: transparent;
+	-fx-padding: 16 0 16 56;
+	-fx-alignment: center-right;
+}
+
+.table-view .table-cell#first-column {
+	-fx-padding: 16 0 16 24;
+	-fx-alignment: center-left;
+}
+
+.table-view .column-header .label {
+	-fx-font-family: "Roboto Medium";
+	-fx-text-fill: #757575;
+	-fx-padding: 16 0 16 24;
+	-fx-alignment: center-right;
+}
+
+.table-view .column-header#first-column .label {
+	-fx-alignment: center-left;
+}
+
+.table-view .column-header-background {
+	-fx-border-color: #e0e0e0;
+	-fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header .arrow {
+	-fx-shape: "m 331,618.3622 23,21 c 0,0 3,3 6,0 3,-3 -2,-7 -2,-7 l -31,-29 -31,29 c 0,0 -5,4 -2,7 3,3 6,0 6,0 l 23,-21 0,36 c 0,0 0,4 4,4 4,0 4,-4 4,-4 z";
+	-fx-padding: 8;
 }
