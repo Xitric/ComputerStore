@@ -20,6 +20,14 @@ public interface TableData {
 	 * @return the name of the column with the specified index.
 	 */
 	String getColumnName(int col);
+	
+	/**
+	 * Get the index of the column with the specified name.
+	 * 
+	 * @param name the name of the column
+	 * @return the index of the column with the specified name
+	 */
+	int getColumnIndex(String name);
 
 	/**
 	 * Get the value in the specified row and column.

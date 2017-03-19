@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import kdavi16.dm505.computerstore.business.StoreMediator;
@@ -54,31 +55,46 @@ public class StoreFrontController implements Initializable {
 		//Reset table
 		resultTable.getColumns().clear();
 		resultTable.getItems().clear();
-		
+
 		//Create columns
 		for (int i = 0; i < data.getColumnCount(); i++) {
 			TableColumn<List<Object>, Object> column = new TableColumn<>(data.getColumnName(i));
-			
+
 			//The first column should be styled specially
 			if (i == 0) {
 				column.setId("first-column");
 			}
-			
+
 			//We need to set our own cell value factory to get the table data to
 			//show up, since we are creating a dynamic table.
 			column.setCellValueFactory(param -> {
 				//Get the index of this table column
 				int index = param.getTableView().getColumns().indexOf(param.getTableColumn());
-				
+
 				//Get the objects on the current row
 				List<Object> row = (List<Object>) param.getValue();
-				
+
 				//Return the value in the current column and row, returning null
 				//if we exceed the boundaries of the list on this row. This
 				//should not happen, but better safe than sorry
 				return new SimpleObjectProperty(row.size() > index ? row.get(index) : null);
 			});
-			
+
+			//We want to display doubles with only two decimals
+			column.setCellFactory(param -> new TableCell<List<Object>, Object>() {
+				@Override
+				protected void updateItem(Object value, boolean empty) {
+					super.updateItem(value, empty);
+					if (empty) {
+						setText(null);
+					} else if (value instanceof Double) {
+						setText(String.format("%.2f", (Double) value));
+					} else {
+						setText(value.toString());
+					}
+				}
+			});
+
 			resultTable.getColumns().add(column);
 		}
 
@@ -109,7 +125,7 @@ public class StoreFrontController implements Initializable {
 	@FXML
 	private void listComponentPricesOnAction(ActionEvent event) {
 		TableData data;
-		
+
 		//Depending on the user's selection, we will either print all kinds or
 		//only one
 		if ("All".equals(componentSelector.getValue())) {
@@ -117,7 +133,13 @@ public class StoreFrontController implements Initializable {
 		} else {
 			data = StoreMediator.getInstance().listComponentPrices(componentSelector.getValue().toLowerCase());
 		}
-		
+
+		present(data);
+	}
+
+	@FXML
+	private void listComputerPricesOnAction(ActionEvent event) {
+		TableData data = StoreMediator.getInstance().listSystemPrices();
 		present(data);
 	}
 }

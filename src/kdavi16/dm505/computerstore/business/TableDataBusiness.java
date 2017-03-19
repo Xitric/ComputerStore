@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import kdavi16.dm505.computerstore.shared.TableData;
 
@@ -78,6 +79,11 @@ class TableDataBusiness implements TableData {
 		return columnNames[col];
 	}
 
+	@Override
+	public int getColumnIndex(String name) {
+		return Arrays.asList(columnNames).indexOf(name);
+	}
+
 	/**
 	 * Add the specified values to this table as a new row. If the amount of
 	 * values exceed the return value of {@link #getColumnCount()}, the extra
@@ -85,10 +91,21 @@ class TableDataBusiness implements TableData {
 	 *
 	 * @param values the values to add
 	 */
-	public void addRow(String... values) {
-		String[] newRow = new String[columnCount];
+	public void addRow(Object... values) {
+		Object[] newRow = new Object[columnCount];
 		System.arraycopy(values, 0, newRow, 0, columnCount);
 		rows.add(newRow);
+	}
+
+	/**
+	 * Set the value of the specified cell.
+	 *
+	 * @param row the row index
+	 * @param col the column index
+	 * @param val the new value
+	 */
+	public void setValue(int row, int col, Object val) {
+		rows.get(row)[col] = val;
 	}
 
 	@Override

@@ -37,7 +37,7 @@
                                  <children>
                                     <Button mnemonicParsing="false" onAction="#listStockOnAction" text="List Stock" />
                                     <Button mnemonicParsing="false" onAction="#listComputersOnAction" text="List Computers" />
-                                    <Button mnemonicParsing="false" text="List Computer Prices" />
+                                    <Button mnemonicParsing="false" onAction="#listComputerPricesOnAction" text="List Computer Prices" />
                                  </children>
                               </FlowPane>
                               <HBox>

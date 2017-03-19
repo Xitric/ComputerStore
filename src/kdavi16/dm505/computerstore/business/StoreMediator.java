@@ -118,6 +118,18 @@ public class StoreMediator {
 	public TableData listComponentPrices(String kind) {
 		return partStorage.listComponentPrices(connection, kind);
 	}
+	
+	/**
+	 * Get a view of all registered systems, their components and their selling
+	 * prices. This will only return those systems that can be built from the
+	 * current stock.
+	 *
+	 * @return a view of all registered systems, their components and their
+	 *         selling prices
+	 */
+	public TableData listSystemPrices() {
+		return partStorage.listSystemPrices(connection);
+	}
 
 	/**
 	 * Close and dispose all resources used by this store mediator.
