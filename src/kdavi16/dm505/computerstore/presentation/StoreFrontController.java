@@ -8,6 +8,7 @@ package kdavi16.dm505.computerstore.presentation;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -15,9 +16,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -46,6 +46,7 @@ public class StoreFrontController implements Initializable {
 	private TextField systemQuantityField;
 
 	private Alert alertDialog;
+	private Alert confirmDialog;
 
 	/**
 	 * Initializes the controller class
@@ -60,10 +61,12 @@ public class StoreFrontController implements Initializable {
 		componentSelector.getItems().addAll("All", "CPU", "RAM", "GPU", "Case", "Mainboard");
 		componentSelector.getSelectionModel().select(0);
 
-		//Alert dialog
+		//Alert dialogs
 		alertDialog = new Alert(AlertType.INFORMATION);
 		alertDialog.setTitle("Error");
 
+		confirmDialog = new Alert(AlertType.CONFIRMATION);
+		confirmDialog.setTitle("Confirmation Dialog");
 	}
 
 	/**
@@ -203,5 +206,47 @@ public class StoreFrontController implements Initializable {
 
 	@FXML
 	private void purchaseSystemOnAction(ActionEvent event) {
+		//Get the name of the selected system, if any
+		List<Object> selection = purchaseSystemTable.getSelectionModel().getSelectedItem();
+		if (selection == null) {
+			alertDialog.setHeaderText("Purchase error");
+			alertDialog.setContentText("You must select a system in the table!");
+			alertDialog.showAndWait();
+			return;
+		}
+
+		String systemName = (String) selection.get(0);
+
+		//Get the desired quantity, if any
+		int quantity = 0;
+		try {
+			quantity = Integer.parseInt(systemQuantityField.getText());
+		} catch (NumberFormatException e) {
+			alertDialog.setHeaderText("Purchase error");
+			alertDialog.setContentText("You must specify a valid quantity in the text field!");
+			alertDialog.showAndWait();
+			return;
+		}
+
+		//Present price offer to user and await agreement
+		double price = StoreMediator.getInstance().priceOffer(systemName, quantity);
+		confirmDialog.setHeaderText("Confirm price offer");
+		confirmDialog.setContentText(String.format("The calculated price offer is %.2f\nDo you still want to purchase?", price));
+
+		Optional<ButtonType> choice = confirmDialog.showAndWait();
+		if (choice.get() != ButtonType.OK) {
+			//User cancelled
+			return;
+		}
+
+		//Component and quantity successfully selected and user agreed, initiate
+		//purchase
+		String result = StoreMediator.getInstance().sellSystem(systemName, quantity);
+		alertDialog.setHeaderText("Purchase result");
+		alertDialog.setContentText(result);
+		alertDialog.showAndWait();
+
+		//Refresh table
+		refreshSystemListOnAction(null);
 	}
 }

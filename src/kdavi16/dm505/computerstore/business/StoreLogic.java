@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import kdavi16.dm505.computerstore.shared.TableData;
 
 /**
@@ -210,15 +212,66 @@ public class StoreLogic {
 				return "Unknown component: " + name;
 			}
 		} catch (SQLException e) {
-			return "Error purchasing " + quantity + " of the item " + name;
+			return "Error purchasing " + quantity + " of the component " + name;
 		} finally {
 			DBUtil.close(st);
 		}
 
-		return "Successfully purchased " + quantity + " of the item " + name;
+		return "Successfully purchased " + quantity + " of the component " + name;
 	}
 
-	//TODO: Sell system, remember transactions!
+	/**
+	 * Attempt to sell the specified quantity of the system with the specified
+	 * name.
+	 *
+	 * @param connection the database connection
+	 * @param name       the name of the system
+	 * @param quantity   the quantity to sell
+	 * @return a string describing the result of calling this method. This
+	 *         should be displayed to the user
+	 */
+	public String sellSystem(Connection connection, String name, int quantity) {
+		Statement st = null;
+
+		try {
+			//Stop auto committing. This is necessary if we run into an
+			//exception in the middle of updating our stock numbers
+			connection.setAutoCommit(false);
+			st = connection.createStatement();
+
+			//Update quantities of all components in the system
+			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
+					+ "select cpuName from System where name = '" + name + "'"
+					+ ");");
+			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
+					+ "select ramName from System where name = '" + name + "'"
+					+ ");");
+			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
+					+ "select caseName from System where name = '" + name + "'"
+					+ ");");
+			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
+					+ "select gpuName from System where name = '" + name + "'"
+					+ ");");
+			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
+					+ "select mainboardName from System where name = '" + name + "'"
+					+ ");");
+
+			//We made it through and can safely commit
+			connection.commit();
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+				return "Error purchasing " + quantity + " of the system " + name;
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		} finally {
+			DBUtil.close(st);
+		}
+
+		return "Successfully purchased " + quantity + " of the system " + name;
+	}
+
 	/**
 	 * Calculate the price offer for the specified system and quantity.
 	 *
@@ -230,7 +283,17 @@ public class StoreLogic {
 	public double priceOffer(Connection connection, String name, int quantity) {
 		//Get the base price for the system
 		TableDataBusiness table = runQuery(connection,
-				"select price from System where name = '" + name + "';");
+				"select ("
+				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = cpuName)"
+				+ "+"
+				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = ramName)"
+				+ "+"
+				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = caseName)"
+				+ "+"
+				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = gpuName)"
+				+ "+"
+				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = mainboardName)"
+				+ ") as price;");
 
 		if (table.getRowCount() == 0) {
 			throw new IllegalArgumentException("No such system " + name);

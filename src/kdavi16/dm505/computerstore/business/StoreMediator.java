@@ -139,6 +139,19 @@ public class StoreMediator {
 	}
 
 	/**
+	 * Attempt to sell the specified quantity of the system with the specified
+	 * name.
+	 *
+	 * @param name     the name of the system
+	 * @param quantity the quantity to sell
+	 * @return a string describing the result of calling this method. This
+	 *         should be displayed to the user
+	 */
+	public String sellSystem(String name, int quantity) {
+		return storeLogic.sellSystem(connection, name, quantity);
+	}
+
+	/**
 	 * Calculate the price offer for the specified system and quantity.
 	 *
 	 * @param name     the name of the system
