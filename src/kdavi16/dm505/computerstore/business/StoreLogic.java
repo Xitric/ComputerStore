@@ -11,8 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import kdavi16.dm505.computerstore.shared.TableData;
 
 /**
@@ -40,7 +38,7 @@ public class StoreLogic {
 		Statement st = null;
 		ResultSet rs = null;
 		TableDataBusiness table = null;
-
+		
 		try {
 			st = connection.createStatement();
 			rs = st.executeQuery(query);
@@ -48,30 +46,11 @@ public class StoreLogic {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			DBUtil.close(st);
 			DBUtil.close(rs);
-		}
-
-		return table;
-	}
-
-	/**
-	 * Safely run the specified update.
-	 *
-	 * @param connection the database connection
-	 * @param update     the update to run
-	 */
-	private void runUpdate(Connection connection, String update) {
-		Statement st = null;
-
-		try {
-			st = connection.createStatement();
-			st.executeUpdate(update);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
 			DBUtil.close(st);
 		}
+		
+		return table;
 	}
 
 	/**
@@ -117,7 +96,7 @@ public class StoreLogic {
 	 */
 	public TableData listComponentPrices(Connection connection, String kind) {
 		TableDataBusiness table;
-
+		
 		if ("all".equals(kind)) {
 			table = runQuery(connection,
 					"select Component.name, kind, price, amount from Component, Stock where Component.name = Stock.name order by kind;");
@@ -138,7 +117,7 @@ public class StoreLogic {
 			double businessPrice = basePrice * SELL_FACTOR;
 			table.setValue(i, priceCol, businessPrice);
 		}
-
+		
 		return table;
 	}
 
@@ -188,7 +167,7 @@ public class StoreLogic {
 			double businessPrice = Math.ceil((basePrice * SELL_FACTOR) / 100.0) * 100.0 - 1;
 			table.setValue(i, priceCol, businessPrice);
 		}
-
+		
 		return table;
 	}
 
@@ -204,11 +183,11 @@ public class StoreLogic {
 	 */
 	public String sellComponent(Connection connection, String name, int quantity) {
 		Statement st = null;
-
+		
 		try {
 			st = connection.createStatement();
 			int changed = st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = '" + name + "';");
-
+			
 			if (changed == 0) {
 				return "Unknown component: " + name;
 			}
@@ -217,7 +196,7 @@ public class StoreLogic {
 		} finally {
 			DBUtil.close(st);
 		}
-
+		
 		return "Successfully purchased " + quantity + " of the component " + name;
 	}
 
@@ -233,44 +212,23 @@ public class StoreLogic {
 	 */
 	public String sellSystem(Connection connection, String name, int quantity) {
 		Statement st = null;
-
+		
 		try {
-			//Stop auto committing. This is necessary if we run into an
-			//exception in the middle of updating our stock numbers
-			connection.setAutoCommit(false);
 			st = connection.createStatement();
 
 			//Update quantities of all components in the system
-			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
-					+ "select cpuName from System where name = '" + name + "'"
-					+ ");");
-
-			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
-					+ "select ramName from System where name = '" + name + "'"
-					+ ");");
-			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
-					+ "select caseName from System where name = '" + name + "'"
-					+ ");");
-			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
-					+ "select gpuName from System where name = '" + name + "'"
-					+ ");");
-			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
-					+ "select mainboardName from System where name = '" + name + "'"
-					+ ");");
-
-			//We made it through and can safely commit
-			connection.commit();
+			st.executeUpdate("update Stock set amount = amount - " + quantity + " where "
+					+ "name = (select cpuName from System where name = '" + name + "') or "
+					+ "name = (select ramName from System where name = '" + name + "') or "
+					+ "name = (select caseName from System where name = '" + name + "') or "
+					+ "name = (select gpuName from System where name = '" + name + "') or "
+					+ "name = (select mainboardName from System where name = '" + name + "');");
 		} catch (SQLException e) {
-			try {
-				connection.rollback();
-				return "Error purchasing " + quantity + " of the system " + name;
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
+			return "Error purchasing " + quantity + " of the system " + name;
 		} finally {
 			DBUtil.close(st);
 		}
-
+		
 		return "Successfully purchased " + quantity + " of the system " + name;
 	}
 
@@ -296,11 +254,11 @@ public class StoreLogic {
 				+ "+"
 				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = mainboardName)"
 				+ ") as price;");
-
+		
 		if (table.getRowCount() == 0) {
 			throw new IllegalArgumentException("No such system " + name);
 		}
-
+		
 		double basePrice = ((BigDecimal) table.getValue(0, 0)).doubleValue();
 
 		//Calculate business price
@@ -333,12 +291,12 @@ public class StoreLogic {
 	public TableData refillStock(Connection connection) {
 		TableDataBusiness table = runQuery(connection,
 				"select name from Component;");
-
+		
 		PreparedStatement st = null;
-
+		
 		try {
 			st = connection.prepareStatement("update Stock set amount = ? where name = ?;");
-
+			
 			for (int i = 0; i < table.getRowCount(); i++) {
 				st.setInt(1, (int) (Math.random() * 20 + 5));
 				st.setString(2, (String) table.getValue(i, 0));
@@ -349,7 +307,7 @@ public class StoreLogic {
 		} finally {
 			DBUtil.close(st);
 		}
-
+		
 		return runQuery(connection,
 				"select * from Stock;");
 	}

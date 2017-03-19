@@ -26,6 +26,7 @@ class DBUtil {
 		if (conn != null) {
 			try {
 				conn.close();
+				System.out.println("Successfully closed connection");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -41,6 +42,7 @@ class DBUtil {
 		if (st != null) {
 			try {
 				st.close();
+				System.out.println("Successfully closed statement");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -56,6 +58,7 @@ class DBUtil {
 		if (rs != null) {
 			try {
 				rs.close();
+				System.out.println("Successfully closed resultset");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
