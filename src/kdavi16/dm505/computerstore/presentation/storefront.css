@@ -176,10 +176,6 @@
 	-fx-background-color: transparent;
 }
 
-/*.table-view {
-	-fx-padding: 0 24 0 24;
-}*/
-
 .table-row-cell {
 	-fx-border-color: #e0e0e0;
 	-fx-border-width: 0 0 1 0;

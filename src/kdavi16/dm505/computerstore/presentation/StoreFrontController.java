@@ -13,10 +13,15 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import kdavi16.dm505.computerstore.business.StoreMediator;
 import kdavi16.dm505.computerstore.shared.TableData;
 
@@ -28,9 +33,19 @@ import kdavi16.dm505.computerstore.shared.TableData;
 public class StoreFrontController implements Initializable {
 
 	@FXML
-	private TableView<List<Object>> resultTable;
-	@FXML
 	private ComboBox<String> componentSelector;
+	@FXML
+	private TableView<List<Object>> printTable;
+	@FXML
+	private TableView<List<Object>> purchaseComponentTable;
+	@FXML
+	private TableView<List<Object>> purchaseSystemTable;
+	@FXML
+	private TextField componentQuantityField;
+	@FXML
+	private TextField systemQuantityField;
+
+	private Alert alertDialog;
 
 	/**
 	 * Initializes the controller class
@@ -44,17 +59,23 @@ public class StoreFrontController implements Initializable {
 	public void initialize(URL url, ResourceBundle rb) {
 		componentSelector.getItems().addAll("All", "CPU", "RAM", "GPU", "Case", "Mainboard");
 		componentSelector.getSelectionModel().select(0);
+
+		//Alert dialog
+		alertDialog = new Alert(AlertType.INFORMATION);
+		alertDialog.setTitle("Error");
+
 	}
 
 	/**
 	 * Fill out the result table with the data from a {@link TableData} object.
 	 *
-	 * @param data the object containing the data to display
+	 * @param data  the object containing the data to display
+	 * @param table the table to present the data in
 	 */
-	private void present(TableData data) {
+	private void present(TableData data, TableView<List<Object>> table) {
 		//Reset table
-		resultTable.getColumns().clear();
-		resultTable.getItems().clear();
+		table.getColumns().clear();
+		table.getItems().clear();
 
 		//Create columns
 		for (int i = 0; i < data.getColumnCount(); i++) {
@@ -95,7 +116,7 @@ public class StoreFrontController implements Initializable {
 				}
 			});
 
-			resultTable.getColumns().add(column);
+			table.getColumns().add(column);
 		}
 
 		//Create rows. Each row consists of a list of objects
@@ -106,40 +127,81 @@ public class StoreFrontController implements Initializable {
 				row.add(data.getValue(i, j));
 			}
 
-			resultTable.getItems().add(row);
+			table.getItems().add(row);
 		}
 	}
 
 	@FXML
 	private void listStockOnAction(ActionEvent event) {
 		TableData data = StoreMediator.getInstance().listComponents();
-		present(data);
+		present(data, printTable);
 	}
 
 	@FXML
 	private void listComputersOnAction(ActionEvent event) {
 		TableData data = StoreMediator.getInstance().listSystems();
-		present(data);
+		present(data, printTable);
 	}
 
 	@FXML
 	private void listComponentPricesOnAction(ActionEvent event) {
-		TableData data;
-
-		//Depending on the user's selection, we will either print all kinds or
-		//only one
-		if ("All".equals(componentSelector.getValue())) {
-			data = StoreMediator.getInstance().listComponentPrices();
-		} else {
-			data = StoreMediator.getInstance().listComponentPrices(componentSelector.getValue().toLowerCase());
-		}
-
-		present(data);
+		TableData data = StoreMediator.getInstance().listComponentPrices(componentSelector.getValue().toLowerCase());
+		present(data, printTable);
 	}
 
 	@FXML
 	private void listComputerPricesOnAction(ActionEvent event) {
 		TableData data = StoreMediator.getInstance().listSystemPrices();
-		present(data);
+		present(data, printTable);
+	}
+
+	@FXML
+	private void refreshComponentListOnAction(ActionEvent event) {
+		TableData data = StoreMediator.getInstance().listComponentPrices("all");
+		present(data, purchaseComponentTable);
+	}
+
+	@FXML
+	private void purchaseComponentOnAction(ActionEvent event) {
+		//Get the name of the selected component, if any
+		List<Object> selection = purchaseComponentTable.getSelectionModel().getSelectedItem();
+		if (selection == null) {
+			alertDialog.setHeaderText("Purchase error");
+			alertDialog.setContentText("You must select a component in the table!");
+			alertDialog.showAndWait();
+			return;
+		}
+
+		String componentName = (String) selection.get(0);
+
+		//Get the desired quantity, if any
+		int quantity = 0;
+		try {
+			quantity = Integer.parseInt(componentQuantityField.getText());
+		} catch (NumberFormatException e) {
+			alertDialog.setHeaderText("Purchase error");
+			alertDialog.setContentText("You must specify a valid quantity in the text field!");
+			alertDialog.showAndWait();
+			return;
+		}
+
+		//Component and quantity successfully selected, initiate purchase
+		String result = StoreMediator.getInstance().sellComponent(componentName, quantity);
+		alertDialog.setHeaderText("Purchase result");
+		alertDialog.setContentText(result);
+		alertDialog.showAndWait();
+
+		//Refresh table
+		refreshComponentListOnAction(null);
+	}
+
+	@FXML
+	private void refreshSystemListOnAction(ActionEvent event) {
+		TableData data = StoreMediator.getInstance().listSystemPrices();
+		present(data, purchaseSystemTable);
+	}
+
+	@FXML
+	private void purchaseSystemOnAction(ActionEvent event) {
 	}
 }

@@ -33,8 +33,10 @@ public class StoreMediator {
 	 */
 	private Connection connection;
 
-	/* Objects for handling various sql queries and updates */
-	private final PartStorage partStorage;
+	/**
+	 * Object for handling various sql queries and updates
+	 */
+	private final StoreLogic storeLogic;
 
 	/**
 	 * Get the singleton instance of the store mediator. This instance will give
@@ -58,7 +60,7 @@ public class StoreMediator {
 		//TODO: Handle connection error
 		establishConnection();
 
-		partStorage = new PartStorage();
+		storeLogic = new StoreLogic();
 	}
 
 	/**
@@ -85,7 +87,7 @@ public class StoreMediator {
 	 * @return a view of all the components and their amounts in the database
 	 */
 	public TableData listComponents() {
-		return partStorage.listComponents(connection);
+		return storeLogic.listComponents(connection);
 	}
 
 	/**
@@ -96,29 +98,21 @@ public class StoreMediator {
 	 *         built
 	 */
 	public TableData listSystems() {
-		return partStorage.listSystems(connection);
+		return storeLogic.listSystems(connection);
 	}
 
 	/**
-	 * Get a view of all the components and their prices ordered by kind.
-	 *
-	 * @return a view of all the components and their prices ordered by kind
-	 */
-	public TableData listComponentPrices() {
-		return partStorage.listComponentPrices(connection);
-	}
-	
-	/**
 	 * Get a view of all the components of the specified kind and their prices.
 	 *
-	 * @param kind the kind of component, in lowercase
+	 * @param kind the kind of component, in lowercase, or "all" to return all
+	 *             components
 	 * @return a view of all the components of the specified kind and their
 	 *         prices
 	 */
 	public TableData listComponentPrices(String kind) {
-		return partStorage.listComponentPrices(connection, kind);
+		return storeLogic.listComponentPrices(connection, kind);
 	}
-	
+
 	/**
 	 * Get a view of all registered systems, their components and their selling
 	 * prices. This will only return those systems that can be built from the
@@ -128,7 +122,31 @@ public class StoreMediator {
 	 *         selling prices
 	 */
 	public TableData listSystemPrices() {
-		return partStorage.listSystemPrices(connection);
+		return storeLogic.listSystemPrices(connection);
+	}
+
+	/**
+	 * Attempt to sell the specified quantity of the component with the
+	 * specified name.
+	 *
+	 * @param name     the name of the component
+	 * @param quantity the quantity to sell
+	 * @return a string describing the result of calling this method. This
+	 *         should be displayed to the user
+	 */
+	public String sellComponent(String name, int quantity) {
+		return storeLogic.sellComponent(connection, name, quantity);
+	}
+
+	/**
+	 * Calculate the price offer for the specified system and quantity.
+	 *
+	 * @param name     the name of the system
+	 * @param quantity the quantity of the system
+	 * @return the price offer for the specified system and quantity
+	 */
+	public double priceOffer(String name, int quantity) {
+		return storeLogic.priceOffer(connection, name, quantity);
 	}
 
 	/**
