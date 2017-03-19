@@ -28,6 +28,12 @@
 	-fx-text-fill: black;
 }
 
+.label.header {
+	-fx-font-size: 28;
+	-fx-text-fill: -blue-base;
+	-fx-padding: 8 0 32 16;
+}
+
 /* ----- Button ----- */
 .button {
 	-fx-font-family: "Roboto Medium";

@@ -16,11 +16,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import kdavi16.dm505.computerstore.business.StoreMediator;
 import kdavi16.dm505.computerstore.shared.TableData;
@@ -41,9 +43,13 @@ public class StoreFrontController implements Initializable {
 	@FXML
 	private TableView<List<Object>> purchaseSystemTable;
 	@FXML
+	private TableView<List<Object>> adminTable;
+	@FXML
 	private TextField componentQuantityField;
 	@FXML
 	private TextField systemQuantityField;
+	@FXML
+	private TextArea sqlTerminal;
 
 	private Alert alertDialog;
 	private Alert confirmDialog;
@@ -248,5 +254,25 @@ public class StoreFrontController implements Initializable {
 
 		//Refresh table
 		refreshSystemListOnAction(null);
+	}
+
+	@FXML
+	private void refillStockOnAction(ActionEvent event) {
+		TableData table = StoreMediator.getInstance().refillStock();
+		present(table, adminTable);
+	}
+
+	@FXML
+	private void executeQueryOnAction(ActionEvent event) {
+		TableData table = StoreMediator.getInstance().executeQuery(sqlTerminal.getText());
+		present(table, adminTable);
+	}
+
+	@FXML
+	private void executeUpdateOnAction(ActionEvent event) {
+	}
+
+	@FXML
+	private void clearOnAction(ActionEvent event) {
 	}
 }

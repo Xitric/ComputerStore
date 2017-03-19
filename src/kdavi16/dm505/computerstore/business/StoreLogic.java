@@ -7,6 +7,7 @@ package kdavi16.dm505.computerstore.business;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -243,6 +244,7 @@ public class StoreLogic {
 			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
 					+ "select cpuName from System where name = '" + name + "'"
 					+ ");");
+
 			st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = ("
 					+ "select ramName from System where name = '" + name + "'"
 					+ ");");
@@ -308,5 +310,47 @@ public class StoreLogic {
 		double reduction = (quantity - 1) * 0.02;
 		reduction = (reduction > 0.2 ? 0.2 : reduction);
 		return businessPrice * (1 - reduction) * quantity;
+	}
+
+	/**
+	 * Execute the specified sql query and return the result.
+	 *
+	 * @param connection the database connection
+	 * @param query      the query to run
+	 * @return the result of the query
+	 */
+	public TableData executeQuery(Connection connection, String query) {
+		return runQuery(connection, query);
+	}
+
+	/**
+	 * Refill the stock by randomizing the amounts of the individual components.
+	 * This is an admin tool.
+	 *
+	 * @param connection the database connection
+	 * @return the resulting Stock relation
+	 */
+	public TableData refillStock(Connection connection) {
+		TableDataBusiness table = runQuery(connection,
+				"select name from Component;");
+
+		PreparedStatement st = null;
+
+		try {
+			st = connection.prepareStatement("update Stock set amount = ? where name = ?;");
+
+			for (int i = 0; i < table.getRowCount(); i++) {
+				st.setInt(1, (int) (Math.random() * 20 + 5));
+				st.setString(2, (String) table.getValue(i, 0));
+				st.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(st);
+		}
+
+		return runQuery(connection,
+				"select * from Stock;");
 	}
 }
