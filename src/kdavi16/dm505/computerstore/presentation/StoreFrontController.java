@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import kdavi16.dm505.computerstore.business.StoreMediator;
@@ -27,6 +28,8 @@ public class StoreFrontController implements Initializable {
 
 	@FXML
 	private TableView<List<Object>> resultTable;
+	@FXML
+	private ComboBox<String> componentSelector;
 
 	/**
 	 * Initializes the controller class
@@ -38,7 +41,8 @@ public class StoreFrontController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-
+		componentSelector.getItems().addAll("All", "CPU", "RAM", "GPU", "Case", "Mainboard");
+		componentSelector.getSelectionModel().select(0);
 	}
 
 	/**
@@ -93,6 +97,27 @@ public class StoreFrontController implements Initializable {
 	@FXML
 	private void listStockOnAction(ActionEvent event) {
 		TableData data = StoreMediator.getInstance().listComponents();
+		present(data);
+	}
+
+	@FXML
+	private void listComputersOnAction(ActionEvent event) {
+		TableData data = StoreMediator.getInstance().listSystems();
+		present(data);
+	}
+
+	@FXML
+	private void listComponentPricesOnAction(ActionEvent event) {
+		TableData data;
+		
+		//Depending on the user's selection, we will either print all kinds or
+		//only one
+		if ("All".equals(componentSelector.getValue())) {
+			data = StoreMediator.getInstance().listComponentPrices();
+		} else {
+			data = StoreMediator.getInstance().listComponentPrices(componentSelector.getValue().toLowerCase());
+		}
+		
 		present(data);
 	}
 }

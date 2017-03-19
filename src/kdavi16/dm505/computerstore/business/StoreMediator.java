@@ -32,7 +32,7 @@ public class StoreMediator {
 	 * The connection to the database.
 	 */
 	private Connection connection;
-	
+
 	/* Objects for handling various sql queries and updates */
 	private final PartStorage partStorage;
 
@@ -57,7 +57,7 @@ public class StoreMediator {
 	private StoreMediator() {
 		//TODO: Handle connection error
 		establishConnection();
-		
+
 		partStorage = new PartStorage();
 	}
 
@@ -78,7 +78,7 @@ public class StoreMediator {
 
 		return true;
 	}
-	
+
 	/**
 	 * Get a view of all the components and their amounts in the database.
 	 *
@@ -86,6 +86,37 @@ public class StoreMediator {
 	 */
 	public TableData listComponents() {
 		return partStorage.listComponents(connection);
+	}
+
+	/**
+	 * Get a view of all registered systems and how many of each can be built
+	 * from the current stock.
+	 *
+	 * @return a view of all registered systems and how many of each can be
+	 *         built
+	 */
+	public TableData listSystems() {
+		return partStorage.listSystems(connection);
+	}
+
+	/**
+	 * Get a view of all the components and their prices ordered by kind.
+	 *
+	 * @return a view of all the components and their prices ordered by kind
+	 */
+	public TableData listComponentPrices() {
+		return partStorage.listComponentPrices(connection);
+	}
+	
+	/**
+	 * Get a view of all the components of the specified kind and their prices.
+	 *
+	 * @param kind the kind of component, in lowercase
+	 * @return a view of all the components of the specified kind and their
+	 *         prices
+	 */
+	public TableData listComponentPrices(String kind) {
+		return partStorage.listComponentPrices(connection, kind);
 	}
 
 	/**
