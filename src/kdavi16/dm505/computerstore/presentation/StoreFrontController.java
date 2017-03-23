@@ -7,7 +7,9 @@ package kdavi16.dm505.computerstore.presentation;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.property.SimpleObjectProperty;
@@ -16,7 +18,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
@@ -24,6 +25,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import kdavi16.dm505.computerstore.business.StoreMediator;
 import kdavi16.dm505.computerstore.shared.TableData;
 
@@ -274,5 +276,34 @@ public class StoreFrontController implements Initializable {
 
 	@FXML
 	private void clearOnAction(ActionEvent event) {
+		sqlTerminal.clear();
+	}
+
+	@FXML
+	private void enterRestockingOnAction(ActionEvent event) {
+		TextInputDialog dialog = new TextInputDialog();
+		dialog.setTitle("Input Dialog");
+
+		Map<String, int[]> restocking = new HashMap<>();
+
+		TableData table = StoreMediator.getInstance().listComponents();
+
+		for (int i = 0; i < table.getRowCount(); i++) {
+			String compName = (String) table.getValue(i, 0);
+
+			dialog.setHeaderText((i + 1) + ". " + compName);
+
+			dialog.getEditor().clear();
+			dialog.setContentText("Minimum amount:");
+			int min = Integer.parseInt(dialog.showAndWait().get());
+
+			dialog.getEditor().clear();
+			dialog.setContentText("Preferred amount:");
+			int pref = Integer.parseInt(dialog.showAndWait().get());
+
+			restocking.put(compName, new int[]{min, pref});
+		}
+
+		StoreMediator.getInstance().setRestocking(restocking);
 	}
 }

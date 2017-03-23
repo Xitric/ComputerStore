@@ -8,6 +8,7 @@ package kdavi16.dm505.computerstore.business;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 import kdavi16.dm505.computerstore.shared.TableData;
 
 /**
@@ -180,6 +181,10 @@ public class StoreMediator {
 	 */
 	public TableData refillStock() {
 		return storeLogic.refillStock(connection);
+	}
+
+	public void setRestocking(Map<String, int[]> restocking) {
+		storeLogic.setRestocking(connection, restocking);
 	}
 
 	/**

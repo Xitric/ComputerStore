@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
+import java.util.Map.Entry;
 import kdavi16.dm505.computerstore.shared.TableData;
 
 /**
@@ -38,7 +40,7 @@ public class StoreLogic {
 		Statement st = null;
 		ResultSet rs = null;
 		TableDataBusiness table = null;
-		
+
 		try {
 			st = connection.createStatement();
 			rs = st.executeQuery(query);
@@ -49,7 +51,7 @@ public class StoreLogic {
 			DBUtil.close(rs);
 			DBUtil.close(st);
 		}
-		
+
 		return table;
 	}
 
@@ -96,7 +98,7 @@ public class StoreLogic {
 	 */
 	public TableData listComponentPrices(Connection connection, String kind) {
 		TableDataBusiness table;
-		
+
 		if ("all".equals(kind)) {
 			table = runQuery(connection,
 					"select Component.name, kind, price, amount from Component, Stock where Component.name = Stock.name order by kind;");
@@ -117,7 +119,7 @@ public class StoreLogic {
 			double businessPrice = basePrice * SELL_FACTOR;
 			table.setValue(i, priceCol, businessPrice);
 		}
-		
+
 		return table;
 	}
 
@@ -167,7 +169,7 @@ public class StoreLogic {
 			double businessPrice = Math.ceil((basePrice * SELL_FACTOR) / 100.0) * 100.0 - 1;
 			table.setValue(i, priceCol, businessPrice);
 		}
-		
+
 		return table;
 	}
 
@@ -183,11 +185,11 @@ public class StoreLogic {
 	 */
 	public String sellComponent(Connection connection, String name, int quantity) {
 		Statement st = null;
-		
+
 		try {
 			st = connection.createStatement();
 			int changed = st.executeUpdate("update Stock set amount = amount - " + quantity + " where name = '" + name + "';");
-			
+
 			if (changed == 0) {
 				return "Unknown component: " + name;
 			}
@@ -196,7 +198,7 @@ public class StoreLogic {
 		} finally {
 			DBUtil.close(st);
 		}
-		
+
 		return "Successfully purchased " + quantity + " of the component " + name;
 	}
 
@@ -212,7 +214,7 @@ public class StoreLogic {
 	 */
 	public String sellSystem(Connection connection, String name, int quantity) {
 		Statement st = null;
-		
+
 		try {
 			st = connection.createStatement();
 
@@ -228,7 +230,7 @@ public class StoreLogic {
 		} finally {
 			DBUtil.close(st);
 		}
-		
+
 		return "Successfully purchased " + quantity + " of the system " + name;
 	}
 
@@ -254,11 +256,11 @@ public class StoreLogic {
 				+ "+"
 				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = mainboardName)"
 				+ ") as price;");
-		
+
 		if (table.getRowCount() == 0) {
 			throw new IllegalArgumentException("No such system " + name);
 		}
-		
+
 		double basePrice = ((BigDecimal) table.getValue(0, 0)).doubleValue();
 
 		//Calculate business price
@@ -270,6 +272,7 @@ public class StoreLogic {
 		return businessPrice * (1 - reduction) * quantity;
 	}
 
+	/* Admin tools, not required */
 	/**
 	 * Execute the specified sql query and return the result.
 	 *
@@ -290,15 +293,15 @@ public class StoreLogic {
 	 */
 	public TableData refillStock(Connection connection) {
 		TableDataBusiness table = runQuery(connection,
-				"select name from Component;");
-		
+				"select name, preferred from MinimumInv;");
+
 		PreparedStatement st = null;
-		
+
 		try {
 			st = connection.prepareStatement("update Stock set amount = ? where name = ?;");
-			
+
 			for (int i = 0; i < table.getRowCount(); i++) {
-				st.setInt(1, (int) (Math.random() * 20 + 5));
+				st.setInt(1, (Integer) table.getValue(i, 1));
 				st.setString(2, (String) table.getValue(i, 0));
 				st.executeUpdate();
 			}
@@ -307,8 +310,27 @@ public class StoreLogic {
 		} finally {
 			DBUtil.close(st);
 		}
-		
+
 		return runQuery(connection,
 				"select * from Stock;");
+	}
+
+	public void setRestocking(Connection connection, Map<String, int[]> restocking) {
+		PreparedStatement st = null;
+
+		try {
+			st = connection.prepareStatement("insert into MinimumInv values(?, ?, ?);");
+
+			for (Entry<String, int[]> entry : restocking.entrySet()) {
+				st.setString(1, entry.getKey());
+				st.setInt(2, entry.getValue()[0]);
+				st.setInt(3, entry.getValue()[1]);
+				st.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(st);
+		}
 	}
 }
