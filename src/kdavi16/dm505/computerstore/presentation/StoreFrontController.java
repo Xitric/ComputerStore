@@ -149,6 +149,12 @@ public class StoreFrontController implements Initializable {
 	}
 
 	@FXML
+	private void listRestockingOnAction(ActionEvent event) {
+		TableData data = StoreMediator.getInstance().listRestocking();
+		present(data, printTable);
+	}
+
+	@FXML
 	private void listComputersOnAction(ActionEvent event) {
 		TableData data = StoreMediator.getInstance().listSystems();
 		present(data, printTable);

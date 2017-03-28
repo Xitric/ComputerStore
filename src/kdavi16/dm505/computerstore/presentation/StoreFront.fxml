@@ -39,6 +39,7 @@
                               <FlowPane hgap="4.0" vgap="4.0">
                                  <children>
                                     <Button mnemonicParsing="false" onAction="#listStockOnAction" text="List Stock" />
+                                    <Button mnemonicParsing="false" onAction="#listRestockingOnAction" text="List Restocking" />
                                     <Button mnemonicParsing="false" onAction="#listComputersOnAction" text="List Computers" />
                                     <Button mnemonicParsing="false" onAction="#listComputerPricesOnAction" text="List Computer Prices" />
                                  </children>

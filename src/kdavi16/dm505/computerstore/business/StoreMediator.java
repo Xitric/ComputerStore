@@ -92,6 +92,16 @@ public class StoreMediator {
 	}
 
 	/**
+	 * Get a view of all components that must be restocked to reach their
+	 * preferred amounts and how many of each must be bought.
+	 *
+	 * @return a view of all components that must be restocked
+	 */
+	public TableData listRestocking() {
+		return storeLogic.listRestocking(connection);
+	}
+
+	/**
 	 * Get a view of all registered systems and how many of each can be built
 	 * from the current stock.
 	 *

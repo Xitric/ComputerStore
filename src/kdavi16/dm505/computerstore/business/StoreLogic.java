@@ -67,6 +67,20 @@ public class StoreLogic {
 	}
 
 	/**
+	 * Get a view of all components that must be restocked to reach their
+	 * preferred amounts and how many of each must be bought.
+	 *
+	 * @param connection the database connection
+	 * @return a view of all components that must be restocked
+	 */
+	public TableData listRestocking(Connection connection) {
+		return runQuery(connection,
+				"select Stock.name, (preferred - amount) as restock"
+				+ " from Stock, MinimumInv"
+				+ " where preferred - amount > 0 and Stock.name = MinimumInv.name;");
+	}
+
+	/**
 	 * Get a view of all registered systems and how many of each can be built
 	 * from the current stock.
 	 *
@@ -303,6 +317,7 @@ public class StoreLogic {
 			for (int i = 0; i < table.getRowCount(); i++) {
 				st.setInt(1, (Integer) table.getValue(i, 1));
 				st.setString(2, (String) table.getValue(i, 0));
+				System.out.println(st.toString());
 				st.executeUpdate();
 			}
 		} catch (SQLException e) {
