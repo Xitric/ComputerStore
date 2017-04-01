@@ -21,7 +21,7 @@ import kdavi16.dm505.computerstore.shared.TableData;
  *
  * @author Kasper
  */
-public class StoreLogic {
+class StoreLogic {
 
 	/**
 	 * The factor by which components' base prices are multiplied when
@@ -148,18 +148,18 @@ public class StoreLogic {
 	 */
 	public TableData listSystemPrices(Connection connection) {
 		TableDataBusiness table = runQuery(connection,
-				"select o.name, cpuName, ramName, caseName, gpuName, mainboardName, ("
-				+ "(select price from Component, System i where i.name = o.name and Component.name = cpuName)"
-				+ "+"
-				+ "(select price from Component, System i where i.name = o.name and Component.name = ramName)"
-				+ "+"
-				+ "(select price from Component, System i where i.name = o.name and Component.name = caseName)"
-				+ "+"
-				+ "(select price from Component, System i where i.name = o.name and Component.name = gpuName)"
-				+ "+"
-				+ "(select price from Component, System i where i.name = o.name and Component.name = mainboardName)"
-				+ ") as price, availability from System o, ("
-				+ "select name, min(amount) as availability from ("
+				"select System.name, cpuName, ramName, caseName, gpuName, mainboardName, ("
+				+ "	(select price from Component where Component.name = cpuName)"
+				+ "	+"
+				+ "	(select price from Component where Component.name = ramName)"
+				+ "	+"
+				+ "	(select price from Component where Component.name = caseName)"
+				+ "	+"
+				+ "	coalesce((select price from Component where Component.name = gpuName), 0)"
+				+ "	+"
+				+ "	(select price from Component where Component.name = mainboardName)"
+				+ ") as price, availability from System, ("
+				+ "	select name, min(amount) as availability from ("
 				+ "		select System.name, amount from System, Stock where"
 				+ "			Stock.name = cpuName or"
 				+ "			Stock.name = ramName or"
@@ -167,9 +167,9 @@ public class StoreLogic {
 				+ "			Stock.name = gpuName or"
 				+ "			Stock.name = mainboardName"
 				+ "		) limiting "
-				+ "group by name"
+				+ "	group by name"
 				+ ") storage "
-				+ "where storage.name = o.name and availability > 0;");
+				+ "where storage.name = System.name and availability > 0;");
 
 		//The above query returns the base prices, so we must calculate the
 		//business prices for the systems. This is 1.3 times the base price
@@ -233,12 +233,15 @@ public class StoreLogic {
 			st = connection.createStatement();
 
 			//Update quantities of all components in the system
-			st.executeUpdate("update Stock set amount = amount - " + quantity + " where "
-					+ "name = (select cpuName from System where name = '" + name + "') or "
-					+ "name = (select ramName from System where name = '" + name + "') or "
-					+ "name = (select caseName from System where name = '" + name + "') or "
-					+ "name = (select gpuName from System where name = '" + name + "') or "
-					+ "name = (select mainboardName from System where name = '" + name + "');");
+			st.executeUpdate("update Stock set amount = amount - " + quantity + " where exists ("
+					+ "	select * from System where System.name = '" + name + "' and ("
+					+ "	Stock.name = cpuName or"
+					+ "	Stock.name = ramName or"
+					+ "	Stock.name = caseName or"
+					+ "	Stock.name = gpuName or"
+					+ "	Stock.name = mainboardName)"
+					+ ");"
+			);
 		} catch (SQLException e) {
 			return "Error purchasing " + quantity + " of the system " + name;
 		} finally {
@@ -260,16 +263,16 @@ public class StoreLogic {
 		//Get the base price for the system
 		TableDataBusiness table = runQuery(connection,
 				"select ("
-				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = cpuName)"
-				+ "+"
-				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = ramName)"
-				+ "+"
-				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = caseName)"
-				+ "+"
-				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = gpuName)"
-				+ "+"
-				+ "(select price from Component, System where System.name = '" + name + "' and Component.name = mainboardName)"
-				+ ") as price;");
+				+ "	(select price from Component where Component.name = cpuName)"
+				+ "	+"
+				+ "	(select price from Component where Component.name = ramName)"
+				+ "	+"
+				+ "	(select price from Component where Component.name = caseName)"
+				+ "	+"
+				+ "	coalesce((select price from Component where Component.name = gpuName), 0)"
+				+ "	+"
+				+ "	(select price from Component where Component.name = mainboardName)"
+				+ ") as price from System where System.name = '" + name + "';");
 
 		if (table.getRowCount() == 0) {
 			throw new IllegalArgumentException("No such system " + name);

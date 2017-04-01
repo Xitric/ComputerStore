@@ -106,10 +106,8 @@ public class StoreFrontController implements Initializable {
 				//Get the objects on the current row
 				List<Object> row = (List<Object>) param.getValue();
 
-				//Return the value in the current column and row, returning null
-				//if we exceed the boundaries of the list on this row. This
-				//should not happen, but better safe than sorry
-				return new SimpleObjectProperty(row.size() > index ? row.get(index) : null);
+				//Return the value in the current column and row
+				return new SimpleObjectProperty(row.get(index));
 			});
 
 			//We want to display doubles with only two decimals

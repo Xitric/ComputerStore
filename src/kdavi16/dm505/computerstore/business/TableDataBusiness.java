@@ -55,7 +55,9 @@ class TableDataBusiness implements TableData {
 			Object[] newRow = new Object[columnCount];
 			for (int i = 0; i < columnCount; i++) {
 				if (rs.getMetaData().getColumnType(i + 1) == Types.CHAR) {
-					newRow[i] = rs.getString(i + 1).trim(); //Trim to remove padding spaces
+					//Trim to remove padding spaces. Use valueOf to handle
+					//possible null value
+					newRow[i] = String.valueOf(rs.getString(i + 1)).trim();
 				} else {
 					newRow[i] = rs.getObject(i + 1);
 				}

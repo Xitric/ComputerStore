@@ -3,23 +3,11 @@
  * https://material.io/
  */
 
-@font-face {
-	src: url('res/fonts/Roboto-Medium.ttf');
-}
-@font-face {
-	src: url('res/fonts/Roboto-Regular.ttf');
-}
-@font-face {
-	src: url('res/fonts/Roboto-Black.ttf');
-}
-
 .mainFxmlClass {
 	-blue-base: #2196f3;
 	-blue-dark1: #1a77c9;
 	-blue-dark2: #176bb5;
 	-javafx-bg: #f4f4f4;
-
-	-fx-font-family: "Roboto Regular";
 }
 
 /* ----- General ----- */
@@ -36,7 +24,6 @@
 
 /* ----- Button ----- */
 .button {
-	-fx-font-family: "Roboto Medium";
 	-fx-font-size: 21;
 	-fx-text-fill: -blue-base;
 	-fx-background-color: transparent;
@@ -75,7 +62,6 @@
 }
 
 .tab-label {
-	-fx-font-family: "Roboto Medium";
 	-fx-font-size: 21;
 	-fx-text-fill: white;
 }
@@ -193,7 +179,6 @@
 }
 
 .table-view .table-cell {
-	-fx-font-family: "Roboto Medium";
 	-fx-border-color: transparent;
 	-fx-padding: 16 0 16 56;
 	-fx-alignment: center-right;
@@ -205,7 +190,6 @@
 }
 
 .table-view .column-header .label {
-	-fx-font-family: "Roboto Medium";
 	-fx-text-fill: #757575;
 	-fx-padding: 16 0 16 56;
 	-fx-alignment: center-right;
