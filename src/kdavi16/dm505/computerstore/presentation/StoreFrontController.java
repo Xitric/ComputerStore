@@ -83,7 +83,7 @@ public class StoreFrontController implements Initializable {
 				+ "'jdbc:postgresql://localhost:5432/computerStore', the "
 				+ "user is assumed to be 'postgres' and the password is "
 				+ "assumed to be '1234'. I have no idea if I can enforce "
-				+ "these settings in the pg_dump, so i haven't.");
+				+ "these settings in the pg_dump, so I haven't.");
 		alertDialog.showAndWait();
 	}
 
@@ -200,12 +200,19 @@ public class StoreFrontController implements Initializable {
 		String componentName = (String) selection.get(0);
 
 		//Get the desired quantity, if any
-		int quantity = 0;
+		int quantity;
 		try {
 			quantity = Integer.parseInt(componentQuantityField.getText());
 		} catch (NumberFormatException e) {
 			alertDialog.setHeaderText("Purchase error");
 			alertDialog.setContentText("You must specify a valid quantity in the text field!");
+			alertDialog.showAndWait();
+			return;
+		}
+
+		if (quantity <= 0) {
+			alertDialog.setHeaderText("Purchase error");
+			alertDialog.setContentText("Quantity must be positive!");
 			alertDialog.showAndWait();
 			return;
 		}
@@ -246,6 +253,13 @@ public class StoreFrontController implements Initializable {
 		} catch (NumberFormatException e) {
 			alertDialog.setHeaderText("Purchase error");
 			alertDialog.setContentText("You must specify a valid quantity in the text field!");
+			alertDialog.showAndWait();
+			return;
+		}
+
+		if (quantity <= 0) {
+			alertDialog.setHeaderText("Purchase error");
+			alertDialog.setContentText("Quantity must be positive!");
 			alertDialog.showAndWait();
 			return;
 		}
