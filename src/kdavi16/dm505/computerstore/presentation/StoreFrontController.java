@@ -71,10 +71,20 @@ public class StoreFrontController implements Initializable {
 
 		//Alert dialogs
 		alertDialog = new Alert(AlertType.INFORMATION);
-		alertDialog.setTitle("Error");
+		alertDialog.setTitle("Alert");
 
 		confirmDialog = new Alert(AlertType.CONFIRMATION);
 		confirmDialog.setTitle("Confirmation Dialog");
+
+		//Startup notification
+		alertDialog.setHeaderText("Important info!");
+		alertDialog.setContentText(
+				"The database url for this application is assumed to be "
+				+ "'jdbc:postgresql://localhost:5432/computerStore', the "
+				+ "user is assumed to be 'postgres' and the password is "
+				+ "assumed to be '1234'. I have no idea if I can enforce "
+				+ "these settings in the pg_dump, so i haven't.");
+		alertDialog.showAndWait();
 	}
 
 	/**
