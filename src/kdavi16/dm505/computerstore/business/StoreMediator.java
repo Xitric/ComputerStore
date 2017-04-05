@@ -174,30 +174,6 @@ public class StoreMediator {
 	}
 
 	/**
-	 * Execute the specified sql query and return the result.
-	 *
-	 * @param query the query to run
-	 * @return the result of the query
-	 */
-	public TableData executeQuery(String query) {
-		return storeLogic.executeQuery(connection, query);
-	}
-
-	/**
-	 * Refill the stock by randomizing the amounts of the individual components.
-	 * This is an admin tool.
-	 *
-	 * @return the resulting Stock relation
-	 */
-	public TableData refillStock() {
-		return storeLogic.refillStock(connection);
-	}
-
-	public void setRestocking(Map<String, int[]> restocking) {
-		storeLogic.setRestocking(connection, restocking);
-	}
-
-	/**
 	 * Close and dispose all resources used by this store mediator.
 	 */
 	public void dispose() {
