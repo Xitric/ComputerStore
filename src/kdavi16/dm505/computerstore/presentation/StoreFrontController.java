@@ -7,9 +7,7 @@ package kdavi16.dm505.computerstore.presentation;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.property.SimpleObjectProperty;
@@ -23,7 +21,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import kdavi16.dm505.computerstore.business.StoreMediator;
@@ -45,13 +42,9 @@ public class StoreFrontController implements Initializable {
 	@FXML
 	private TableView<List<Object>> purchaseSystemTable;
 	@FXML
-	private TableView<List<Object>> adminTable;
-	@FXML
 	private TextField componentQuantityField;
 	@FXML
 	private TextField systemQuantityField;
-	@FXML
-	private TextArea sqlTerminal;
 
 	private Alert alertDialog;
 	private Alert confirmDialog;
@@ -76,15 +69,36 @@ public class StoreFrontController implements Initializable {
 		confirmDialog = new Alert(AlertType.CONFIRMATION);
 		confirmDialog.setTitle("Confirmation Dialog");
 
-		//Startup notification
-		alertDialog.setHeaderText("Important info!");
-		alertDialog.setContentText(
-				"The database url for this application is assumed to be "
-				+ "'jdbc:postgresql://localhost:5432/computerStore', the "
-				+ "user is assumed to be 'postgres' and the password is "
-				+ "assumed to be '1234'. I have no idea if I can enforce "
-				+ "these settings in the pg_dump, so I haven't.");
-		alertDialog.showAndWait();
+		//Get database information
+		TextInputDialog in = new TextInputDialog();
+		in.setTitle("Database name");
+		in.setHeaderText("Enter database name");
+		in.setContentText("jdbc:postgresql://localhost:5432/");
+		Optional<String> result = in.showAndWait();
+		String dbName = null;
+		if (result.isPresent()) {
+			dbName = result.get();
+		}
+
+		in.setTitle("Database user");
+		in.setHeaderText("Enter name of database user");
+		in.setContentText("Name:");
+		result = in.showAndWait();
+		String dbUser = null;
+		if (result.isPresent()) {
+			dbUser = result.get();
+		}
+
+		in.setTitle("Database password");
+		in.setHeaderText("Enter database password");
+		in.setContentText("Password:");
+		result = in.showAndWait();
+		String dbPassword = null;
+		if (result.isPresent()) {
+			dbPassword = result.get();
+		}
+
+		StoreMediator.initialize(dbName, dbUser, dbPassword);
 	}
 
 	/**
@@ -247,7 +261,7 @@ public class StoreFrontController implements Initializable {
 		String systemName = (String) selection.get(0);
 
 		//Get the desired quantity, if any
-		int quantity = 0;
+		int quantity;
 		try {
 			quantity = Integer.parseInt(systemQuantityField.getText());
 		} catch (NumberFormatException e) {

@@ -7,12 +7,9 @@ package kdavi16.dm505.computerstore.business;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Map;
-import java.util.Map.Entry;
 import kdavi16.dm505.computerstore.shared.TableData;
 
 /**
