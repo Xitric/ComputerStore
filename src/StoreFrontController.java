@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package kdavi16.dm505.computerstore.presentation;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,8 +17,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import kdavi16.dm505.computerstore.business.StoreMediator;
-import kdavi16.dm505.computerstore.shared.TableData;
 
 /**
  * FXML Controller class
